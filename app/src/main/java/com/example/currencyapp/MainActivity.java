@@ -20,12 +20,17 @@ public class MainActivity extends AppCompatActivity implements CurrencyView{
     @BindView(R.id.spinner) Spinner spinner;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     CurrencyPresenter presenter;
+    LoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        loadingDialog = new LoadingDialog(MainActivity.this);
+        loadingDialog.startLoadingDialog();
+
 
         presenter = new CurrencyPresenter(this);
         presenter.setSpinnerCurrencies();
@@ -52,8 +57,11 @@ public class MainActivity extends AppCompatActivity implements CurrencyView{
 
     @Override
     public void onSetRecyclerViewData(List<Rate> rates,String base) {
-        MyAdapter myAdapter = new MyAdapter(rates,base,this);
-        recyclerView.setAdapter(myAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        if (rates!=null){
+            MyAdapter myAdapter = new MyAdapter(rates,base,this);
+            recyclerView.setAdapter(myAdapter);
+            loadingDialog.dismissDialog();
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }
     }
 }
